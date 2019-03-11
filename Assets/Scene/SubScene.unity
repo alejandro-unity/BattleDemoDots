@@ -130,6 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1591403735}
   - component: {fileID: 1591403736}
+  - component: {fileID: 1591403737}
   m_Layer: 0
   m_Name: BattleConfig
   m_TagString: Untagged
@@ -167,3 +168,16 @@ MonoBehaviour:
     type: 3}
   prefabBlue: {fileID: 3744979738614230502, guid: 3193f95a253a74c72a788b35432442fd,
     type: 3}
+--- !u!114 &1591403737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591403734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea7d7495833204790ba1d3a8755397f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ConversionMode: 0
