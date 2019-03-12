@@ -27,7 +27,6 @@ public class AssignTargetSystem : JobComponentSystem
         {
             Target target = new Target();
             int n = random.NextInt(0, potentialTargets.Length);
-            Debug.Log(n);
             target.Value = potentialTargets[n];
             commandBuffer.AddComponent(index, entity , target );
         }
@@ -69,7 +68,7 @@ public class AssignTargetSystem : JobComponentSystem
         
         if (blueSoldierEntities.Length > 0)
         {
-            m_SoldiersWithoutTarget.SetFilter(redRenderMesh);
+            m_SoldiersWithoutTarget.SetFilter(redRenderMesh); // red soldiers without target  
             handle = new AssignTargetJob
             {
                 // when to use ToConcurrent ? 
@@ -89,6 +88,15 @@ public class AssignTargetSystem : JobComponentSystem
         //CONFIGURE BLUE SOLDIERS
         if (redSoldierEntities.Length > 0)
         {
+            m_SoldiersWithoutTarget.SetFilter(blueRenderMesh); // blue soldiers without target 
+            handle = new AssignTargetJob
+            {
+                commandBuffer = endSimCommandBuffer.CreateCommandBuffer().ToConcurrent(),
+                potentialTargets = redSoldierEntities,
+                random = random
+            }.ScheduleGroup(m_SoldiersWithoutTarget, handle);
+
+            endSimCommandBuffer.AddJobHandleForProducer(handle);
         }
         else
         {
