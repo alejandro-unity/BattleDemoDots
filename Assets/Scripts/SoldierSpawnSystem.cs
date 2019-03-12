@@ -8,11 +8,15 @@ public struct SoliderSpawnJob : IJob
     public Entity prefabSoldier;
     public float3 position;
     public EntityCommandBuffer CommandBuffer;
+    public int count;
        
     public void Execute()
     {
-        var instance = CommandBuffer.Instantiate(prefabSoldier);
-        CommandBuffer.SetComponent(instance , new Translation{Value = position});
+        for (int i = 0; i < count; i++)
+        {
+            var instance = CommandBuffer.Instantiate(prefabSoldier);
+            CommandBuffer.SetComponent(instance, new Translation {Value = position + new float3(i+0.5f,0,0)});
+        }
     }
 }
 public class SoldierSpawnSystem : JobComponentSystem
@@ -27,11 +31,11 @@ public class SoldierSpawnSystem : JobComponentSystem
         if (Camera.main == null)
             return handle;
         Entity prefab = Entity.Null; 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0))
         {
             prefab = GetSingleton<BattleConfigData>().prefabRed;
         }
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButtonDown(1))
         {
             prefab = GetSingleton<BattleConfigData>().prefabBlue;
         }
@@ -46,6 +50,7 @@ public class SoldierSpawnSystem : JobComponentSystem
                 SoliderSpawnJob job = new SoliderSpawnJob();
                 job.position = ray.GetPoint(dist);
                 job.prefabSoldier = prefab;
+                job.count = 3;
                 job.CommandBuffer = m_EndSimulationEntityCommandBufferSystem.CreateCommandBuffer();
                 handle = job.Schedule(handle);
                 m_EndSimulationEntityCommandBufferSystem.AddJobHandleForProducer(handle);
