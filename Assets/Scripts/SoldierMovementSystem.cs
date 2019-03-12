@@ -19,6 +19,11 @@ public class SoldierMovementSystem : JobComponentSystem
                 // just store the orientation
                 soldierOrientation.Value = math.normalizesafe(dst - src);
             }
+            else
+            {
+                // prevent to keep moving if the target is destroyed
+                soldierOrientation.Value = float3.zero;
+            }
         }
     }
     public struct SoldierMovSystemJob : IJobProcessComponentData<Translation, SoldierOrientation>

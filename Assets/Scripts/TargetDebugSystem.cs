@@ -6,6 +6,11 @@ using UnityEngine;
 
 public class TargetDebugSystem : ComponentSystem
 {
+    protected override void OnCreateManager()
+    {
+        Enabled = false;
+    }
+
     protected override void OnUpdate()
     {
         //you can also use: var allEnitities = GetComponentDataFromEntity<Translation>(true); and get the array element

@@ -6,6 +6,13 @@ using Unity.Transforms;
 
 public class SoliderKillSystem : JobComponentSystem
 {
+    /*Problems: 
+        The system keeps moving the player with the orientation 
+        We need to remove the Target. 
+        If the target.value do not exist we can set the orientation to zero
+        Problem with the TargetDebugSystem, disable for now
+     */ 
+
     private EndSimulationEntityCommandBufferSystem endSimCmd;
     
     public struct SoliderContactJob : IJobProcessComponentDataWithEntity<Translation, Target>
