@@ -31,11 +31,11 @@ public class SoldierSpawnSystem : JobComponentSystem
         if (Camera.main == null)
             return handle;
         Entity prefab = Entity.Null; 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             prefab = GetSingleton<BattleConfigData>().prefabRed;
         }
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButton(1))
         {
             prefab = GetSingleton<BattleConfigData>().prefabBlue;
         }

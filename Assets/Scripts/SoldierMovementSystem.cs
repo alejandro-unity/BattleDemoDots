@@ -7,39 +7,43 @@ using UnityEngine;
 
 public class SoldierMovementSystem : JobComponentSystem
 {
-    public struct SoldierMovSystemJob : IJobProcessComponentData<Translation, Target>
+    public struct SoldierOrientationJob : IJobProcessComponentData<Translation, Target, SoldierOrientation>
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allPositions;
-        public float dt;
-        public void Execute(ref Translation translation, ref Target target )
+        public void Execute([ReadOnly]ref Translation translation, [ReadOnly]ref Target target, ref SoldierOrientation soldierOrientation)
         {
-            // can not be accessed in the Job
-            //var t = EntityManager.GetComponentData<Translation>(target.Value);
-            // it could be killed
             if (allPositions.Exists(target.Value))
             {
                 var src = translation.Value;
                 var dst = allPositions[target.Value].Value;
-                var dir = math.normalizesafe(src - dst);
-                translation.Value += dir * dt;
+                // just store the orientation
+                soldierOrientation.Value = math.normalizesafe(dst - src);
             }
         }
-        // this job has this issue 
-        /*The writable NativeArray SoldierMovSystemJob.Iterator is the same NativeArray as
-         SoldierMovSystemJob.Data.allPositions,
-         two NativeArrays may not be the same (aliasing).
-         */
+    }
+    public struct SoldierMovSystemJob : IJobProcessComponentData<Translation, SoldierOrientation>
+    {
+        public float dt;
+        public void Execute(ref Translation translation, [ReadOnly]ref SoldierOrientation soldierOrientation)
+        {
+            translation.Value += soldierOrientation.Value * dt;
+        }
     }
     
     protected override JobHandle OnUpdate(JobHandle handle )
     {
-        handle = new SoldierMovSystemJob
+        handle = new SoldierOrientationJob
         {
             // this needs to be readOnly
             allPositions = GetComponentDataFromEntity<Translation>(),
-            dt = Time.deltaTime
-            
         }.Schedule(this, handle);
+        
+        handle = new SoldierMovSystemJob
+        {
+            // this needs to be readOnly
+            dt = Time.deltaTime
+        }.Schedule(this, handle);
+        
         return handle;
     }
 }
