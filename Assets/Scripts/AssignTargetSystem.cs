@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Rendering;
@@ -25,7 +24,7 @@ public class AssignTargetSystem : JobComponentSystem
         public int randomNumber;
         
         // add Target componentData
-        public void Execute(Entity entity, int index, [Unity.Collections.ReadOnly]ref SoldierTag soldierTag)
+        public void Execute(Entity entity, int index, [ReadOnly]ref SoldierTag soldierTag)
         {
             Target target = new Target();
             // using the old random which is not great
