@@ -7,10 +7,12 @@ using Unity.Transforms;
 public class SoliderKillSystem : JobComponentSystem
 {
     /*Problems: 
-        The system keeps moving the player with the orientation 
-        We need to remove the Target. 
-        If the target.value do not exist we can set the orientation to zero
-        Problem with the TargetDebugSystem, disable for now
+        The system keeps moving the player with the orientation [fixed] 
+        We need to remove the Target. [fixed but not correctly] 
+        If the target.value do not exist we can set the orientation to zero [fixed]
+        Problem with the TargetDebugSystem, disable for now        
+        
+        All entities passed to EntityManager must exist. One of the entities has already been destroyed or was never created.
      */ 
 
     private EndSimulationEntityCommandBufferSystem endSimCmd;
@@ -25,7 +27,10 @@ public class SoliderKillSystem : JobComponentSystem
             {
                 if (math.distancesq(translation.Value, allTranslation[target.Value].Value) < 1)
                 {
-                    CommandBuffer.DestroyEntity(index, entity);
+                    // Can we destroy the target here ?  
+                    CommandBuffer.DestroyEntity(index, target.Value);
+                    //We can not remove the Target since we are iterating over it
+                    CommandBuffer.RemoveComponent<Target>( index, entity );
                 }
             }
         }
