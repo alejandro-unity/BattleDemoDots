@@ -14,11 +14,11 @@ public class TargetDebugSystem : ComponentSystem
         ForEach((Entity entity, ref Target target) =>
         {
             // if the entity was killed
-            if (target.Value != Entity.Null)
+            if (target.Value != Entity.Null && entity != Entity.Null)
             {
-                var entityTranlation = EntityManager.GetComponentData<Translation>(entity);
+                var entityTranslation = EntityManager.GetComponentData<Translation>(entity);
                 var targetTranslation = EntityManager.GetComponentData<Translation>(target.Value);
-                Debug.DrawLine(entityTranlation.Value, targetTranslation.Value);
+                Debug.DrawLine(entityTranslation.Value, targetTranslation.Value);
             }
         });
 
