@@ -21,18 +21,41 @@ public class SoliderKillSystem : JobComponentSystem
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allTranslation;
         public EntityCommandBuffer.Concurrent CommandBuffer;
+        // if other thread mark this variable as 0 is ok  
+        [NativeDisableParallelForRestriction]public ComponentDataFromEntity<SoldierAlive> aliveFromEntity;
         public void Execute(Entity entity, int index, [ReadOnly]ref Translation translation, ref Target target)
         {
             if (allTranslation.Exists(target.Value))
             {
                 if (math.distancesq(translation.Value, allTranslation[target.Value].Value) < 1)
                 {
-                    // Can we destroy the target here ?  
-                    CommandBuffer.DestroyEntity(index, target.Value);
-                    //We can not remove the Target since we are iterating over it
-                    CommandBuffer.RemoveComponent<Target>( index, entity );
+                    aliveFromEntity[target.Value] = new SoldierAlive { Value = 0 };
                 }
             }
+        }
+    }
+    
+    // Remove targets.
+    // Retrieve all entities with target and check if that entity still exist 
+    struct RemoveInvalidTargets : IJobProcessComponentDataWithEntity<Target>
+    {
+        public EntityCommandBuffer.Concurrent CommandBuffer;
+        [ReadOnly] public ComponentDataFromEntity<Translation> PositionFromEntity;
+        public void Execute(Entity entity, int index, ref Target target)
+        {
+            if(!PositionFromEntity.Exists(target.Value))
+                CommandBuffer.RemoveComponent<Target>(index, entity);
+        }
+    }
+    
+    // use the SoldierAlive value to Destroy the entities
+    struct RemoveDeadSoldiers : IJobProcessComponentDataWithEntity<SoldierAlive>
+    {
+        public EntityCommandBuffer.Concurrent CommandBuffer;
+        public void Execute(Entity entity, int index, ref SoldierAlive alive)
+        {
+            if(alive.Value == 0)
+                CommandBuffer.DestroyEntity(index, entity);
         }
     }
 
@@ -46,11 +69,27 @@ public class SoliderKillSystem : JobComponentSystem
         ComponentDataFromEntity<Translation> allTranslation =  GetComponentDataFromEntity<Translation>();
         handle = new SoliderContactJob
         {
-            allTranslation = allTranslation,
+            allTranslation =  allTranslation,
+            aliveFromEntity = GetComponentDataFromEntity<SoldierAlive>(),
             CommandBuffer  = endSimCmd.CreateCommandBuffer().ToConcurrent()
             
         }.Schedule(this, handle);
         
+        // Job that remove the target  
+        handle = new RemoveInvalidTargets
+        {
+            CommandBuffer = endSimCmd.CreateCommandBuffer().ToConcurrent(),
+            PositionFromEntity = GetComponentDataFromEntity<Translation>()
+        }.Schedule(this, handle);
+        
+        // Job that Destroy entities
+        handle = new RemoveDeadSoldiers
+        {
+            CommandBuffer = endSimCmd.CreateCommandBuffer().ToConcurrent()
+        }.Schedule(this, handle);
+        
+        
+        // setup the endsimCMD
         endSimCmd.AddJobHandleForProducer(handle);
         
         return handle;
