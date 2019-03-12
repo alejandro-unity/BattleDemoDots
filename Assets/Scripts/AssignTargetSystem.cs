@@ -21,14 +21,14 @@ public class AssignTargetSystem : JobComponentSystem
         //public EntityCommandBuffer commandBuffer;
         public EntityCommandBuffer.Concurrent commandBuffer;
         [Unity.Collections.ReadOnly, DeallocateOnJobCompletion] public NativeArray<Entity> potentialTargets;
-        public int randomNumber;
-        
+        public Unity.Mathematics.Random random;
         // add Target componentData
         public void Execute(Entity entity, int index, [ReadOnly]ref SoldierTag soldierTag)
         {
             Target target = new Target();
-            // using the old random which is not great
-            target.Value = potentialTargets[randomNumber];
+            int n = random.NextInt(0, potentialTargets.Length);
+            Debug.Log(n);
+            target.Value = potentialTargets[n];
             commandBuffer.AddComponent(index, entity , target );
         }
     }
@@ -63,6 +63,10 @@ public class AssignTargetSystem : JobComponentSystem
         //CONFIGURE RED SOLDIERS
         // Schedule Job only on the Group of m_SoldiersWithoutTarget
         // Red soldiers without target 
+        var random = new Unity.Mathematics.Random((uint)UnityEngine.Random.Range(1, 100000));
+        // using the simple random for this example 
+        //https://forum.unity.com/threads/mathematics-random-with-in-ijobprocesscomponentdata.598192/
+        
         if (blueSoldierEntities.Length > 0)
         {
             m_SoldiersWithoutTarget.SetFilter(redRenderMesh);
@@ -71,8 +75,7 @@ public class AssignTargetSystem : JobComponentSystem
                 // when to use ToConcurrent ? 
                 commandBuffer = endSimCommandBuffer.CreateCommandBuffer().ToConcurrent(),
                 potentialTargets = blueSoldierEntities,
-                // use the old style random which doesnt work correctly.
-                randomNumber =  UnityEngine.Random.Range(0, blueSoldierEntities.Length )
+                random = random
             }.ScheduleGroup(m_SoldiersWithoutTarget, handle);
 
             endSimCommandBuffer.AddJobHandleForProducer(handle);
@@ -82,7 +85,6 @@ public class AssignTargetSystem : JobComponentSystem
             blueSoldierEntities.Dispose();
             
         }
-
         
         //CONFIGURE BLUE SOLDIERS
         if (redSoldierEntities.Length > 0)
