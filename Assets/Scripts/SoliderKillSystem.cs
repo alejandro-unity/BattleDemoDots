@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -16,7 +17,7 @@ public class SoliderKillSystem : JobComponentSystem
      */ 
 
     private EndSimulationEntityCommandBufferSystem endSimCmd;
-    
+    [BurstCompile]
     public struct SoliderContactJob : IJobProcessComponentDataWithEntity<Translation, Target>
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allTranslation;
@@ -49,6 +50,7 @@ public class SoliderKillSystem : JobComponentSystem
     }
     
     // use the SoldierAlive value to Destroy the entities
+    [BurstCompile]
     struct RemoveDeadSoldiers : IJobProcessComponentDataWithEntity<SoldierAlive>
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;

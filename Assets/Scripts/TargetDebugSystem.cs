@@ -13,17 +13,17 @@ public class TargetDebugSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        //you can also use: var allEnitities = GetComponentDataFromEntity<Translation>(true); and get the array element
         
-        // All entities with target assigned
+        //changed to use the GetComponentDataFromEntity
+        var allEnitities = GetComponentDataFromEntity<Translation>(true);
         ForEach((Entity entity, ref Target target) =>
         {
             // if the entity was killed
-            if (target.Value != Entity.Null && entity != Entity.Null)
+            if (allEnitities.Exists(target.Value))
             {
-                var entityTranslation = EntityManager.GetComponentData<Translation>(entity);
-                var targetTranslation = EntityManager.GetComponentData<Translation>(target.Value);
-                Debug.DrawLine(entityTranslation.Value, targetTranslation.Value);
+                var entityTranslation = allEnitities[entity].Value;
+                var targetTranslation = allEnitities[target.Value].Value;
+                Debug.DrawLine(entityTranslation, targetTranslation);
             }
         });
 

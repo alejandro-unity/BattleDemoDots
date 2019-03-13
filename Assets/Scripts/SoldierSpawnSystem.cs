@@ -50,7 +50,7 @@ public class SoldierSpawnSystem : JobComponentSystem
                 SoliderSpawnJob job = new SoliderSpawnJob();
                 job.position = ray.GetPoint(dist);
                 job.prefabSoldier = prefab;
-                job.count = 3;
+                job.count = 20;
                 job.CommandBuffer = m_EndSimulationEntityCommandBufferSystem.CreateCommandBuffer();
                 handle = job.Schedule(handle);
                 m_EndSimulationEntityCommandBufferSystem.AddJobHandleForProducer(handle);

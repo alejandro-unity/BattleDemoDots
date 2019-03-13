@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -7,6 +8,7 @@ using UnityEngine;
 
 public class SoldierMovementSystem : JobComponentSystem
 {
+    [BurstCompile]
     public struct SoldierOrientationJob : IJobProcessComponentData<Translation, Target, SoldierOrientation>
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allPositions;
@@ -26,12 +28,13 @@ public class SoldierMovementSystem : JobComponentSystem
             }
         }
     }
+    [BurstCompile]
     public struct SoldierMovSystemJob : IJobProcessComponentData<Translation, SoldierOrientation>
     {
         public float dt;
         public void Execute(ref Translation translation, [ReadOnly]ref SoldierOrientation soldierOrientation)
         {
-            translation.Value += soldierOrientation.Value * dt;
+            translation.Value += soldierOrientation.Value * dt*2;
         }
     }
     
