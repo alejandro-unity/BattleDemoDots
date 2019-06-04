@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -15,7 +16,7 @@ public struct SoliderSpawnJob : IJob
         for (int i = 0; i < count; i++)
         {
             var instance = CommandBuffer.Instantiate(prefabSoldier);
-            CommandBuffer.SetComponent(instance, new Translation {Value = position + new float3(i+0.5f,0,0)});
+            CommandBuffer.SetComponent(instance, new Translation {Value = position /*+ new float3(i*0.5f,0,0)*/});
         }
     }
 }
@@ -25,6 +26,7 @@ public class SoldierSpawnSystem : JobComponentSystem
     protected override void OnCreateManager()
     {
         m_EndSimulationEntityCommandBufferSystem = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        //RequireSingletonForUpdate<BattleConfigData>();
     }
     protected override JobHandle OnUpdate(JobHandle handle)
     {
@@ -53,6 +55,7 @@ public class SoldierSpawnSystem : JobComponentSystem
                 job.count = 20;
                 job.CommandBuffer = m_EndSimulationEntityCommandBufferSystem.CreateCommandBuffer();
                 handle = job.Schedule(handle);
+                
                 m_EndSimulationEntityCommandBufferSystem.AddJobHandleForProducer(handle);
             }
         }
