@@ -25,7 +25,7 @@ public class SoldierSpawnSystem : JobComponentSystem
     private EndSimulationEntityCommandBufferSystem m_EndSimulationEntityCommandBufferSystem;
     protected override void OnCreateManager()
     {
-        m_EndSimulationEntityCommandBufferSystem = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        m_EndSimulationEntityCommandBufferSystem = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         //RequireSingletonForUpdate<BattleConfigData>();
     }
     protected override JobHandle OnUpdate(JobHandle handle)

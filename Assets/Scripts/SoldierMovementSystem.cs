@@ -9,7 +9,7 @@ using UnityEngine;
 public class SoldierMovementSystem : JobComponentSystem
 {
     [BurstCompile]
-    public struct SoldierOrientationJob : IJobProcessComponentData<Translation, Target, SoldierOrientation>
+    public struct SoldierOrientationJob : IJobForEach<Translation, Target, SoldierOrientation>
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allPositions;
         public void Execute([ReadOnly]ref Translation translation, [ReadOnly]ref Target target, ref SoldierOrientation soldierOrientation)
@@ -29,7 +29,7 @@ public class SoldierMovementSystem : JobComponentSystem
         }
     }
     [BurstCompile]
-    public struct SoldierMovSystemJob : IJobProcessComponentData<Translation, SoldierOrientation>
+    public struct SoldierMovSystemJob : IJobForEach<Translation, SoldierOrientation>
     {
         public float dt;
         public void Execute(ref Translation translation, [ReadOnly]ref SoldierOrientation soldierOrientation)

@@ -16,7 +16,7 @@ public class TargetDebugSystem : ComponentSystem
         
         //changed to use the GetComponentDataFromEntity
         var allEnitities = GetComponentDataFromEntity<Translation>(true);
-        ForEach((Entity entity, ref Target target) =>
+        Entities.ForEach((Entity entity, ref Target target) =>
         {
             // if the entity was killed
             if (allEnitities.Exists(target.Value))

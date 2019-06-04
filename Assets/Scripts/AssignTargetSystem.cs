@@ -13,10 +13,10 @@ public struct Target : IComponentData
 public class AssignTargetSystem : JobComponentSystem
 {
     
-    ComponentGroup m_AllSoldiers;
-    ComponentGroup m_SoldiersWithoutTarget;
+    EntityQuery m_AllSoldiers;
+    EntityQuery m_SoldiersWithoutTarget;
     EndSimulationEntityCommandBufferSystem endSimCommandBuffer;
-    struct AssignTargetJob:IJobProcessComponentDataWithEntity<SoldierTag>
+    struct AssignTargetJob:IJobForEachWithEntity<SoldierTag>
     {
         //public EntityCommandBuffer commandBuffer;
         public EntityCommandBuffer.Concurrent commandBuffer;
@@ -34,16 +34,15 @@ public class AssignTargetSystem : JobComponentSystem
 
     protected override void OnCreateManager()
     {
-        m_AllSoldiers = GetComponentGroup(
+        m_AllSoldiers = GetEntityQuery(
             ComponentType.ReadOnly<SoldierTag>(),
             ComponentType.ReadOnly<RenderMesh>() // renderMesh ? 
         );
-        m_SoldiersWithoutTarget = GetComponentGroup(
+        m_SoldiersWithoutTarget = GetEntityQuery(
             ComponentType.ReadOnly<SoldierTag>(),
             ComponentType.ReadOnly<RenderMesh>(),
             ComponentType.Exclude<Target>());
-
-        endSimCommandBuffer = World.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        endSimCommandBuffer = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     protected override JobHandle OnUpdate(JobHandle handle)
@@ -75,7 +74,8 @@ public class AssignTargetSystem : JobComponentSystem
                 commandBuffer = endSimCommandBuffer.CreateCommandBuffer().ToConcurrent(),
                 potentialTargets = blueSoldierEntities,
                 random = random
-            }.ScheduleGroup(m_SoldiersWithoutTarget, handle);
+            //}.ScheduleGroup(m_SoldiersWithoutTarget, handle);
+            }.Schedule(m_SoldiersWithoutTarget, handle);
 
             endSimCommandBuffer.AddJobHandleForProducer(handle);
         }
@@ -94,7 +94,8 @@ public class AssignTargetSystem : JobComponentSystem
                 commandBuffer = endSimCommandBuffer.CreateCommandBuffer().ToConcurrent(),
                 potentialTargets = redSoldierEntities,
                 random = random
-            }.ScheduleGroup(m_SoldiersWithoutTarget, handle);
+            //}.ScheduleGroup(m_SoldiersWithoutTarget, handle);
+            }.Schedule(m_SoldiersWithoutTarget, handle);
 
             endSimCommandBuffer.AddJobHandleForProducer(handle);
         }

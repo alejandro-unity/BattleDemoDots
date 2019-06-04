@@ -18,7 +18,7 @@ public class SoliderKillSystem : JobComponentSystem
 
     private EndSimulationEntityCommandBufferSystem endSimCmd;
     [BurstCompile]
-    public struct SoliderContactJob : IJobProcessComponentDataWithEntity<Translation, Target>
+    public struct SoliderContactJob : IJobForEachWithEntity<Translation, Target>
     {
         [ReadOnly] public ComponentDataFromEntity<Translation> allTranslation;
         public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -38,7 +38,7 @@ public class SoliderKillSystem : JobComponentSystem
     
     // Remove targets.
     // Retrieve all entities with target and check if that entity still exist 
-    struct RemoveInvalidTargets : IJobProcessComponentDataWithEntity<Target>
+    struct RemoveInvalidTargets : IJobForEachWithEntity<Target>
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;
         [ReadOnly] public ComponentDataFromEntity<Translation> PositionFromEntity;
@@ -51,7 +51,7 @@ public class SoliderKillSystem : JobComponentSystem
     
     // use the SoldierAlive value to Destroy the entities
     [BurstCompile]
-    struct RemoveDeadSoldiers : IJobProcessComponentDataWithEntity<SoldierAlive>
+    struct RemoveDeadSoldiers : IJobForEachWithEntity<SoldierAlive>
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;
         public void Execute(Entity entity, int index, ref SoldierAlive alive)
@@ -63,7 +63,7 @@ public class SoliderKillSystem : JobComponentSystem
 
     protected override void OnCreateManager()
     {
-        endSimCmd = World.Active.GetOrCreateManager<EndSimulationEntityCommandBufferSystem>();
+        endSimCmd = World.Active.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     protected override JobHandle OnUpdate(JobHandle handle)
